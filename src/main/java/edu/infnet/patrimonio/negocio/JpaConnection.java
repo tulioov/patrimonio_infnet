@@ -11,7 +11,12 @@ public class JpaConnection {
 	
 	public static EntityManagerFactory getEmf() {
 		if(emf == null) {
-			emf  = Persistence.createEntityManagerFactory("patrimonio");
+			try {
+				emf  = Persistence.createEntityManagerFactory("patrimonio");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		}
 		return emf;
 	}

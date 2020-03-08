@@ -1,1 +1,1 @@
-<jsp:forward page="/PatrSrv?action=lista"/>
+<jsp:forward page="pages/home.jsp"/>
