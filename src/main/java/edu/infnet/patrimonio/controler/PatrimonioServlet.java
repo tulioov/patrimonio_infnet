@@ -25,20 +25,20 @@ public class PatrimonioServlet extends HttpServlet {
 	private String action;
 	private PatrimonioService service;
 	private PatrimonioDAO patrimonioDAO;
-	private PatrimonioJPADao dao; 
+	private PatrimonioJPADao dao;
 
 	public PatrimonioServlet() {
 		super();
 		dao = new PatrimonioJPADao();
-		patrimonioDAO =  new PatrimonioDAO();
+		patrimonioDAO = new PatrimonioDAO();
 		service = new PatrimonioService();
 	}
-	
+
 	private void initVariaveis(HttpServletRequest request) {
 		id = request.getParameter("id");
 		descricao = request.getParameter("descricao");
 		localizacao = request.getParameter("localizacao");
-		
+
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -50,15 +50,16 @@ public class PatrimonioServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		System.out.println("teste2");
-		
+		System.out.println("teste2");  
+
 		action = request.getParameter("action");
 		try {
 			if ("new".equals(action)) {
 				initVariaveis(request);
-				if(id.equals(null))
+				if (id == null || id.equals("")) {
 					salvarUmNovoPatrimonio(request);
-				else {
+					listaPatrimonio(request, response);
+				} else {
 					int idInteger = Integer.parseInt(id);
 					Patrimonio patrimonio = new Patrimonio();
 					patrimonio.setId(idInteger);
@@ -77,24 +78,25 @@ public class PatrimonioServlet extends HttpServlet {
 				deletarPatrimonio(request, response);
 			}
 			if ("lista".equals(action)) {
-				listaPatrimonio(request,response);
+				listaPatrimonio(request, response);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("error", "Erro no no banco de dados!");
-		} 
+		}
 
 	}
-	
+
 	private void salvarUmNovoPatrimonio(HttpServletRequest request) {
+
 		if (service.validarpatrimonio(descricao, localizacao)) {
-			
+
 			int idInteger = -1;
-			if(!id.equals("")) {
+			if (!"".equals(id)) {
 				idInteger = Integer.parseInt(id);
 			}
-			
+
 			Patrimonio patrimonio = new Patrimonio(idInteger, descricao, localizacao);
 			service.save(patrimonio);
 			request.setAttribute("Sucesso", "Salvo com sucesso!");
@@ -102,30 +104,34 @@ public class PatrimonioServlet extends HttpServlet {
 			request.setAttribute("error", "descricao ou localizacao inválidos!");
 		}
 	}
-	
-	private void alterarPatrimonio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
+	private void alterarPatrimonio(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		request.setAttribute("id", id);
 		request.setAttribute("descricao", descricao);
 		request.setAttribute("localizacao", localizacao);
 		request.getRequestDispatcher("pages/patrimonio.jsp").forward(request, response);
-		
+
 	}
 
-	private void deletarPatrimonio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+	private void deletarPatrimonio(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		int inInteger = Integer.parseInt(id);
-		//Patrimonio patrimonio = new Patrimonio(inInteger);
+		// Patrimonio patrimonio = new Patrimonio(inInteger);
 		patrimonioDAO.delete(id);
 		listaPatrimonio(request, response);
-		
+
 	}
-	private void listaPatrimonio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
+	private void listaPatrimonio(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		List<Patrimonio> patrimonios = patrimonioDAO.findAllProdutos();
 		request.setAttribute("lista_patrimonios", patrimonios);
 		request.getRequestDispatcher("pages/home.jsp").forward(request, response);
-		
+
 	}
 
 }
